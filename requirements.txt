@@ -1,0 +1,7 @@
+langchain
+langchain-community 
+langchain-core
+openai
+pillow
+numpy
+scikit-learn

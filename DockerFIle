@@ -1,0 +1,12 @@
+# FROM python:3.11-slim
+FROM python:3.13.5
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ ./src
+COPY rapport.md ./
+
+CMD ["python", "src/main.py"]

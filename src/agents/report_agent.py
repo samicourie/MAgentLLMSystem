@@ -1,18 +1,20 @@
-from utils.config import OPENAI_KEY
+import logging
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
+logger = logging.getLogger(__name__)
+
 
 class ReportAgent:
-    def __init__(self):
+    def __init__(self, openai_key):
         self.llm = ChatOpenAI(
             temperature=0.4,
             model='gpt-4',  # ou 'gpt-3.5-turbo' si limite
-            openai_api_key=OPENAI_KEY
+            openai_api_key=openai_key
         )
 
     def generate(self, vision_data, weather_data, language='fr'):
-        print('[ReportAgent] Generating report with OpenAI...')
+        logger.info('[ReportAgent] Generating report with OpenAI...')
 
         if language == 'fr':
             
@@ -45,5 +47,47 @@ class ReportAgent:
             weather=str(weather_data),
         )
 
-        response = self.llm(messages)
-        return response.content
+        try:
+            response = self.llm.invoke(messages)
+            return response.content
+        except Exception as e:
+            logger.error(f'[ReportAgent] Error during report generation: {e}')
+            return '[ReportAgent] Error during report generation.'
+        
+    def evaluate(self, vision_data, weather_data, generated_report,):
+        logger.info('[ReportAgent] Evaluating previously generated report...')
+
+        evaluation_prompt = ChatPromptTemplate.from_template(
+            '''
+            Compare this generated report with the input data.
+
+            == Vision Data ==
+            {vision}
+
+            == Weather Data ==
+            {weather}
+
+            == Report ==
+            {report}
+
+            Please rate:
+            - Accuracy
+            - Coverage
+            - Professional tone
+            - Relevance of recommendations
+            ''')
+
+        messages = evaluation_prompt.format_messages(
+            vision=str(vision_data),
+            weather=str(weather_data),
+            report = str(generated_report)
+        )
+
+        try:
+            response = self.llm.invoke(messages)
+            return response.content
+        except Exception as e:
+            logger.error(f'[ReportAgent] Error during report evaluation: {e}')
+            return '[ReportAgent] Error during report evaluation.'
+        
+    

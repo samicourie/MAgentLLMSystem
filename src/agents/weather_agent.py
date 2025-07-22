@@ -20,8 +20,7 @@ class WeatherAgent:
         self.important_weather = important_weather or [
             'temperature_2m', 'apparent_temperature', 'relativehumidity_2m',
             'windspeed_10m', 'windgusts_10m', 'precipitation', 'snowfall',
-            'shortwave_radiation', 'weathercode', 'soil_moisture_0_to_7cm',
-            'soil_moisture_7_to_28cm'
+            'shortwave_radiation', 'weathercode', 'soil_moisture_0_to_7cm'
         ]
         
     def load_data(self):
@@ -44,26 +43,30 @@ class WeatherAgent:
 
         total_risks = 0
         risks = {}
-        
+        risk_timestamps = set()
+
         # For each key in the air quality and weather data, check if it is important and if it exceeds the risk threshold.
         for key, val_arr in data['airquality']['hourly'].items():
             if key in self.important_airquality:
-                for val in val_arr:
+                for ind, val in enumerate(val_arr):
                     if val is not None and detect_risk(key, val):
                         if key not in risks:
                             risks[key] = 0
                         risks[key] += 1
                         total_risks += 1
+                        risk_timestamps.add(data['airquality']['hourly']['time'][ind])
+
 
         # For each key in the weather data, check if it is important and if it exceeds the risk threshold.
         for key, val_arr in data['historical']['hourly'].items():
             if key in self.important_weather:
-                for val in val_arr:
+                for ind, val in enumerate(val_arr):
                     if val is not None and detect_risk(key, val):
                         if key not in risks:
                             risks[key] = 0
                         risks[key] += 1
                         total_risks += 1
+                        risk_timestamps.add(data['airquality']['hourly']['time'][ind])
 
-        logger.debug(f'Total risks detected: {total_risks}, Risks detail: {risks}')
-        return {'Total Risks': total_risks, 'Risks': risks}
+        logger.debug(f'Total risks detected: {total_risks}, Risks detail: {risks}, Risk Timestamps: {risk_timestamps}')
+        return {'Total Risks': total_risks, 'Risks': risks, 'Risk Timestamps': risk_timestamps}

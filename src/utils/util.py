@@ -35,8 +35,50 @@ def parse_llm_response(xml_string):
         prediction = child.find('prediction').text
         confidence = float(child.find('confidence').text)
         result[category] = {
-            'prediction': prediction,
+            'detection': prediction,
             'confidence': confidence
         }
 
     return result
+
+
+def get_predictions(prediction_data):
+    hat_hat = []
+    no_ppe = []
+    for img_obj in prediction_data['images']:
+        for d_obj in img_obj.get('detections', []):
+            if type(d_obj) == str:
+                hat_hat.append(-1)
+                no_ppe.append(-1)
+                continue
+            
+            if d_obj['has-hard-hat']['prediction'] == '1':
+                hat_hat.append(1)
+            else:
+                hat_hat.append(0)
+
+            if d_obj['no-ppe']['prediction'] == '1':
+                no_ppe.append(1)
+            else:
+                no_ppe.append(0)
+    
+    return {'has_hat': hat_hat, 'no_ppe': no_ppe}
+
+
+# Get ground truth data from the data
+def get_ground_truth(true_data):
+    hat_hat = []
+    no_ppe = []
+    for _, img_obj in true_data['images'].items():
+        for d_obj in img_obj.get('detections', []):
+            if d_obj['attributes']['has_hard_hat'] >= 0.5:
+                hat_hat.append(1)
+            else:
+                hat_hat.append(0)
+
+            if d_obj['attributes']['no_ppe'] >= 0.5:
+                no_ppe.append(1)
+            else:
+                no_ppe.append(0)
+    
+    return {'has_hat': hat_hat, 'no_ppe': no_ppe}

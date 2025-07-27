@@ -1,0 +1,46 @@
+<incidents>
+    <incident>
+        <timestamp>2025-07-11T13:00</timestamp>
+        <image_path>670484413_30a9e6a7-1a81-4f83-89d2-d14f5093f4e1.jpg</image_path>
+        <ppe_risks>
+            <risk>No PP Equipment</risk>
+        </ppe_risks>
+        <weather_risks>
+            <risk>shortwave_radiation</risk>
+        </weather_risks>
+        <recommendation>Ensure all workers are wearing proper personal protective equipment. Limit exposure to shortwave radiation by seeking shade and wearing sun protection.</recommendation>
+    </incident>
+    <incident>
+        <timestamp>2025-07-15T11:00</timestamp>
+        <image_path>672269385_94c762db-768b-4cd6-955c-f5df99203f91.jpg</image_path>
+        <ppe_risks>
+            <risk>No PP Equipment</risk>
+        </ppe_risks>
+        <weather_risks>
+            <risk>shortwave_radiation</risk>
+        </weather_risks>
+        <recommendation>Ensure all workers are wearing proper personal protective equipment. Limit exposure to shortwave radiation by seeking shade and wearing sun protection.</recommendation>
+    </incident>
+    <incident>
+        <timestamp>2025-07-15T12:00</timestamp>
+        <image_path>672286586_4c9d0e58-d730-4a12-8c0b-663c88143cbf.jpg</image_path>
+        <ppe_risks>
+            <risk>No PP Equipment</risk>
+        </ppe_risks>
+        <weather_risks>
+            <risk>shortwave_radiation</risk>
+        </weather_risks>
+        <recommendation>Ensure all workers are wearing proper personal protective equipment. Limit exposure to shortwave radiation by seeking shade and wearing sun protection.</recommendation>
+    </incident>
+    <incident>
+        <timestamp>2025-07-15T13:00</timestamp>
+        <image_path>672384818_d3155c53-1ac2-4a15-bd12-83bc8fe5099b.jpg</image_path>
+        <ppe_risks>
+            <risk>No PP Equipment</risk>
+        </ppe_risks>
+        <weather_risks>
+            <risk>shortwave_radiation</risk>
+        </weather_risks>
+        <recommendation>Ensure all workers are wearing proper personal protective equipment. Limit exposure to shortwave radiation by seeking shade and wearing sun protection.</recommendation>
+    </incident>
+</incidents>

@@ -21,7 +21,7 @@ class VisionAgent:
         self.image_folder = os.path.join(self.assets_path, image_folder)
         self.metadata_file = os.path.join(self.assets_path, metadata_file)
 
-        self.vision_llm = OpenAI(api_key=os.getenv('MY_OPENAI_API_KEY'))
+        self.vision_llm = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
     def _load_metadata(self):
         if not os.path.exists(self.metadata_file):

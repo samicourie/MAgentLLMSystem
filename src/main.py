@@ -26,14 +26,14 @@ def main():
     report = report_agent.generate(vision_data, weather_data)
     print('\n--- Rapport de Risques ---\n')
     print(report)
-    with open('report.xml', 'w', encoding='utf-8') as file:
+    with open('src/output/report.xml', 'w', encoding='utf-8') as file:
         file.write(report)
 
     manual_report = combine_data_on_timestamp(vision_data, weather_data)
     
     report = report_agent.evaluate(report, manual_report)
 
-    with open('evaluation.txt', 'w', encoding='utf-8') as file:
+    with open('src/output/evaluation.txt', 'w', encoding='utf-8') as file:
         file.write(report)
 
     print('\n--- Report evaluation ---\n')

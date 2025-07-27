@@ -1,8 +1,9 @@
 import os
+import json
 import logging
 from openai import OpenAI
 from dotenv import load_dotenv
-# from langchain.prompts import ChatPromptTemplate
+from utils.config import REPORT_MODEL, TEMPERATURE, MAX_TOKENS_800, get_test_prompt
 
 load_dotenv()
 
@@ -12,80 +13,44 @@ logger = logging.getLogger(__name__)
 class ReportAgent:
     def __init__(self):
 
-        '''
-        self.llm = ChatOpenAI(
-            temperature=0,
-            model='gpt-4',
-            openai_api_key=os.getenv('OPENAI_API_KEY')
-        )
-        '''
         self.llm = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-    def generate(self, vision_data, weather_data, language='fr'):
+    def generate(self, vision_data, weather_data):
         logger.info('[ReportAgent] Generating report with OpenAI...')
 
-        if language == 'fr':
-            
-            prompt = '''
-            Vous êtes un expert en sécurité sur les chantiers. Voici des données issues de la vision par caméra et de la météo. Rédigez un rapport clair, structuré, et professionnel sur les risques identifiés.
+        vision_json = json.dumps(vision_data, indent=2, ensure_ascii=False)
+        weather_json = json.dumps(weather_data, indent=2, ensure_ascii=False)
 
-            === Données de vision ===
-            {vision_data}
+        prompt = get_test_prompt(vision_json, weather_json)
 
-            === Données météo ===
-            {weather_data}
-
-            Générez ensuite des recommandations de sécurité.
-            '''
-        else:
-            prompt = '''
-            You are a safety expert for construction sites. Here are data from camera vision and weather. Write a clear, structured, and professional report on the identified risks.
-
-            === Vision Data ===
-            {vision_data}
-
-            === Weather Data ===
-            {weather_data}
-
-            Then generate safety recommendations.
-            '''
-
-        '''
-        messages = prompt.format_messages(
-            vision=str(vision_data),
-            weather=str(weather_data),
-        )
-        '''
         try:
             # Call OpenAI chat completion
             response = self.llm.chat.completions.create(
-                model='gpt-4',
-                temperature=0,
+                model=REPORT_MODEL,
+                temperature=TEMPERATURE,
                 messages=[
                     {"role": "system", "content": "You are a safety expert for construction sites."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=800
+                max_tokens=MAX_TOKENS_800
             )
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f'[ReportAgent] Error during report generation: {e}')
             return '[ReportAgent] Error during report generation.'
         
-    def evaluate(self, vision_data, weather_data, generated_report,):
+    def evaluate(self, ai_report, manual_report):
+
         logger.info('[ReportAgent] Evaluating previously generated report...')
 
-        evaluation_prompt = '''
-            Compare this generated report with the input data.
+        evaluation_prompt = f'''
+            Compare this AI generated report with another report generate manually.
 
-            == Vision Data ==
-            {vision_data}
+            == AI Report ==
+            {ai_report}
 
-            == Weather Data ==
-            {weather_data}
-
-            == Report ==
-            {generated_report}
+            == Manual Report ==
+            {str(manual_report)}
 
             Please rate:
             - Accuracy
@@ -94,26 +59,17 @@ class ReportAgent:
             - Relevance of recommendations
             '''
 
-        '''
-        messages = evaluation_prompt.format_messages(
-            vision=str(vision_data),
-            weather=str(weather_data),
-            report = str(generated_report)
-        )
-        '''
         try:
             response = self.llm.chat.completions.create(
-                model='gpt-4',
-                temperature=0,
+                model=REPORT_MODEL,
+                temperature=TEMPERATURE,
                 messages=[
                     {"role": "system", "content": "You are a safety expert for construction sites."},
                     {"role": "user", "content": evaluation_prompt}
                 ],
-                max_tokens=800
+                max_tokens=MAX_TOKENS_800
             )
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f'[ReportAgent] Error during report evaluation: {e}')
             return '[ReportAgent] Error during report evaluation.'
-        
-    

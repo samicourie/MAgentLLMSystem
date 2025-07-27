@@ -1,5 +1,6 @@
 import io
 import base64
+from datetime import datetime
 import xml.etree.ElementTree as ET
 
 
@@ -42,6 +43,7 @@ def parse_llm_response(xml_string):
     return result
 
 
+# Parse the prediction data from the LLM XML response
 def get_predictions(prediction_data):
     hat_hat = []
     no_ppe = []
@@ -65,7 +67,7 @@ def get_predictions(prediction_data):
     return {'has_hat': hat_hat, 'no_ppe': no_ppe}
 
 
-# Get ground truth data from the data
+# Get ground truth data from the image metadata json file
 def get_ground_truth(true_data):
     hat_hat = []
     no_ppe = []
@@ -82,3 +84,35 @@ def get_ground_truth(true_data):
                 no_ppe.append(0)
     
     return {'has_hat': hat_hat, 'no_ppe': no_ppe}
+
+
+def combine_data_on_timestamp(vision_data, weather_data):
+    # STEP 1: Normalize PPE timestamps
+    normalized_vision_data = {}
+    for ts, entries in vision_data.get("Risks Summary", {}).items():
+        # Convert "YYYY:MM:DD HH:MM:SS" → "YYYY-MM-DDTHH"
+        norm_ts = datetime.strptime(ts, "%Y:%m:%d %H:%M:%S").strftime("%Y-%m-%dT%H")
+        if norm_ts not in normalized_vision_data:
+            normalized_vision_data[norm_ts] = []
+        normalized_vision_data[norm_ts].extend(entries)
+
+    # STEP 2: Normalize Weather timestamps
+    normalized_weather_data = {}
+    for ts, risk in weather_data.get("Risks Summary", {}).items():
+        # Convert "YYYY-MM-DDTHH:MM" → "YYYY-MM-DDTHH"
+        norm_ts = datetime.strptime(ts, "%Y-%m-%dT%H:%M").strftime("%Y-%m-%dT%H")
+        normalized_weather_data[norm_ts] = risk
+
+    # STEP 3: Build a list of overlapping timestamps
+    common_hours = set(normalized_vision_data.keys()) & set(normalized_weather_data.keys())
+
+    # STEP 4: Build combined risk report to feed into GPT
+    combined = {}
+    for hour in sorted(common_hours):
+        combined[hour] = {
+            "image_paths": [item["image_path"] for item in normalized_vision_data[hour]],
+            "ppe_risks": [item["Risks"] for item in normalized_vision_data[hour]],
+            "weather_risks": normalized_weather_data[hour],
+        }
+
+    return combined

@@ -26,12 +26,12 @@ def lower_than_or_equal(value, threshold):
 # Thresholds are example values; adjust based on domain knowledge or regulations
 key_dict = {
     'pm2_5': {'threshold': 25, 'func': higher_than},  # µg/m³, WHO guideline
-    'pm10': {'threshold': 100, 'func': higher_than},  # adjusted from 10000 to 100 (likely typo)
+    'pm10': {'threshold': 100, 'func': higher_than},
     'carbon_monoxide': {'threshold': 200, 'func': higher_than},  # ppm or µg/m³
     'nitrogen_dioxide': {'threshold': 500, 'func': higher_than},
     'sulphur_dioxide': {'threshold': 180, 'func': higher_than},
-    'ozone': {'threshold': 25, 'func': higher_than},
-    'ammonia': {'threshold': 1.0, 'func': higher_than},
+    'ozone': {'threshold': 180, 'func': higher_than},
+    'ammonia': {'threshold': 25, 'func': higher_than},
     'aerosol_optical_depth': {'threshold': 6, 'func': higher_than},
     'uv_index': {'threshold': 50, 'func': higher_than},
     'grass_pollen': {'threshold': 50, 'func': higher_than},
@@ -49,7 +49,7 @@ key_dict = {
     'snowfall': {'threshold': 1, 'func': higher_than},
     'shortwave_radiation': {'threshold': 700, 'func': higher_than},
     'weathercode': {'threshold': 50, 'func': higher_than_or_equal},  # unclear what this encodes
-    'soil_moisture_0_to_7cm': {'min_threshold': 0.1, 'max_threshold': 0.5, 'func': out_of_range}
+    'soil_moisture_0_to_7cm': {'min_threshold': 0, 'max_threshold': 5, 'func': out_of_range}
 }
 
 

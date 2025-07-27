@@ -20,7 +20,7 @@ class WeatherAgent:
         self.important_weather = important_weather or [
             'temperature_2m', 'apparent_temperature', 'relativehumidity_2m',
             'windspeed_10m', 'windgusts_10m', 'precipitation', 'snowfall',
-            'shortwave_radiation', 'weathercode', 'soil_moisture_0_to_7cm'
+            'shortwave_radiation', 'soil_moisture_0_to_7cm'
         ]
         
     def load_data(self):
@@ -42,31 +42,32 @@ class WeatherAgent:
             return {}
 
         total_risks = 0
-        risks = {}
-        risk_timestamps = set()
 
+        risk_summary = dict()
         # For each key in the air quality and weather data, check if it is important and if it exceeds the risk threshold.
-        for key, val_arr in data['airquality']['hourly'].items():
+        for key, val_arr in data['airquality.forecast']['hourly'].items():
             if key in self.important_airquality:
                 for ind, val in enumerate(val_arr):
                     if val is not None and detect_risk(key, val):
-                        if key not in risks:
-                            risks[key] = 0
-                        risks[key] += 1
+                        timestamp = data['airquality.forecast']['hourly']['time'][ind]
+                        if timestamp not in risk_summary:
+                            risk_summary[timestamp] = []
+                            risk_summary[timestamp].append(key)
+                        risk_summary[timestamp][key] += 1
                         total_risks += 1
-                        risk_timestamps.add(data['airquality']['hourly']['time'][ind])
 
 
         # For each key in the weather data, check if it is important and if it exceeds the risk threshold.
-        for key, val_arr in data['historical']['hourly'].items():
+        for key, val_arr in data['forecast']['hourly'].items():
             if key in self.important_weather:
                 for ind, val in enumerate(val_arr):
                     if val is not None and detect_risk(key, val):
-                        if key not in risks:
-                            risks[key] = 0
-                        risks[key] += 1
+                        timestamp = data['forecast']['hourly']['time'][ind]
+                        if timestamp not in risk_summary:
+                            risk_summary[timestamp] = []
+                            risk_summary[timestamp].append(key)
                         total_risks += 1
-                        risk_timestamps.add(data['airquality']['hourly']['time'][ind])
 
-        logger.debug(f'Total risks detected: {total_risks}, Risks detail: {risks}, Risk Timestamps: {risk_timestamps}')
-        return {'Total Risks': total_risks, 'Risks': risks, 'Risk Timestamps': risk_timestamps}
+        risk_summary = dict(sorted(risk_summary.items()))
+        logger.debug(f'Total risks detected: {total_risks}, Risks Summary: {risk_summary}')
+        return {'Total Risks': total_risks, 'Risks Summary': risk_summary}

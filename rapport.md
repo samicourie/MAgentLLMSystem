@@ -12,7 +12,7 @@ Ce fichier représente un rapport qui met en évidence les différentes étapes 
 
 ## Structure du code
 ```
-enlaps_test/
+MagentLLMSystem/
 ├── src/
     ├── agents/
     │   ├── report_agent.py
@@ -27,7 +27,6 @@ enlaps_test/
     └── train.ipynb
 ├── Dockerfile
 ├── rapport.md
-├── README.md
 ├── requirements.txt
 └── assets/      <-- not committed to git (gitignored)
 
